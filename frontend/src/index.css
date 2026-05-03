@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans bg-gray-50 text-gray-900 antialiased;
+  }
+}
+
+@layer components {
+  /* Glass Card Effect */
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-lg;
+  }
+
+  /* Gradient backgrounds */
+  .gradient-whatsapp {
+    background: linear-gradient(135deg, #075E54 0%, #128C7E 50%, #25D366 100%);
+  }
+
+  .gradient-whatsapp-soft {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%);
+  }
+
+  /* Input styles */
+  .input-field {
+    @apply w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 
+           placeholder-gray-400 transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-whatsapp-500/40 focus:border-whatsapp-500;
+  }
+
+  /* Button styles */
+  .btn-primary {
+    @apply px-6 py-3 bg-whatsapp-600 text-white font-semibold rounded-xl 
+           shadow-lg shadow-whatsapp-600/25 transition-all duration-200
+           hover:bg-whatsapp-700 hover:shadow-xl hover:shadow-whatsapp-700/30
+           active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-xl 
+           transition-all duration-200
+           hover:bg-gray-200 active:scale-[0.98];
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-red-50 text-red-600 font-medium rounded-xl 
+           transition-all duration-200
+           hover:bg-red-100 active:scale-[0.98];
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c8e6c9;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #81c784;
+}
+
+/* Smooth page transitions */
+.page-transition {
+  animation: fadeIn 0.3s ease-out;
+}
