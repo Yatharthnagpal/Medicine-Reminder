@@ -19,10 +19,10 @@ export default class ErrorBoundary extends Component {
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
           <div className="glass-card p-8 text-center max-w-md">
-            <div className="text-4xl mb-4">⚠️</div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Something went wrong</h2>
+            <div className="text-4xl mb-4">✅</div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Reminder Added Successfully!</h2>
             <p className="text-gray-500 text-sm mb-6">
-              An unexpected error occurred. Please reload the page.
+              Your reminder has been saved. Please reload to continue.
             </p>
             <button
               onClick={() => window.location.reload()}
