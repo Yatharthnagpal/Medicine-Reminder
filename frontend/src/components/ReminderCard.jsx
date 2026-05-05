@@ -3,14 +3,19 @@ import StatusBadge from './StatusBadge';
 
 export default function ReminderCard({ reminder, onEdit, onDelete, onStatusChange }) {
   const repeatLabels = {
-    'one-time': 'One-time',
-    daily: 'Daily',
     '10-days': '10 Days',
+    '15-days': '15 Days',
+    '20-days': '20 Days',
     monthly: 'Monthly',
   };
 
   const getWhatsAppLink = (phone, message, medicine) => {
-    const cleanPhone = phone.replace(/[\s\-\+]/g, '');
+    // Strip everything except digits
+    let cleanPhone = phone.replace(/\D/g, '');
+    // Ensure 91 country code prefix
+    if (!cleanPhone.startsWith('91')) {
+      cleanPhone = '91' + cleanPhone;
+    }
     let text = message || '';
     if (medicine) {
       text += `\n💊 ${medicine}`;
@@ -104,28 +109,15 @@ export default function ReminderCard({ reminder, onEdit, onDelete, onStatusChang
           <MessageSquare className="w-3.5 h-3.5" />
           WhatsApp
         </a>
-        
-        {reminder.status === 'pending' && onStatusChange && (
-          <>
-            <button
-              onClick={() => onStatusChange(reminder.id, 'sent')}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
-              title="Mark as Sent"
-            >
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              Sent
-            </button>
-          </>
-        )}
-        
-        {reminder.status !== 'pending' && onStatusChange && (
+
+        {reminder.status !== 'sent' && onStatusChange && (
           <button
-            onClick={() => onStatusChange(reminder.id, 'pending')}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-            title="Mark as Pending"
+            onClick={() => onStatusChange(reminder.id, 'sent')}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+            title="Mark as Sent"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
-            Reset
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            Sent
           </button>
         )}
 

@@ -52,7 +52,13 @@ _allowed_origins = [
 # Add production frontend URL from environment (e.g. https://medicine-reminder.vercel.app)
 _frontend_url = os.getenv("FRONTEND_URL", "")
 if _frontend_url:
-    _allowed_origins.append(_frontend_url.rstrip("/"))
+    # Support comma-separated URLs for multiple frontends
+    for url in _frontend_url.split(","):
+        url = url.strip().rstrip("/")
+        if url:
+            _allowed_origins.append(url)
+
+logger.info("🌐 Allowed CORS origins: %s", _allowed_origins)
 
 # CORS middleware
 app.add_middleware(
@@ -71,3 +77,9 @@ app.include_router(router)
 def health_check():
     """Health check endpoint."""
     return {"status": "ok", "message": "WhatsApp Reminder API is running 🟢"}
+
+
+@app.get("/health", tags=["health"])
+def health_ping():
+    """Lightweight ping endpoint for uptime monitors (keeps Render awake)."""
+    return {"status": "ok"}

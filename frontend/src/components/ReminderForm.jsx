@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { Send, X, User, Phone, MessageSquare, Calendar, RotateCcw, Loader2 } from 'lucide-react';
 
 const REPEAT_OPTIONS = [
-  { value: 'one-time', label: 'One-time' },
-  { value: 'daily', label: 'Daily' },
   { value: '10-days', label: '10 Days' },
+  { value: '15-days', label: '15 Days' },
+  { value: '20-days', label: '20 Days' },
   { value: 'monthly', label: 'Monthly' },
 ];
 
@@ -12,16 +12,16 @@ const getTemplateMessage = (name) => `🙏 Namaskar ${name || '{Name}'} ji!
 
 Kamal Medicals, Behror ki taraf se aapko yaad dilana chahte hain:
 
-Samay par dawai lena bhule nahi! aapki zaroorat ki dawaiyon ke hamare paas aayein.
-📍 Kamal Medicals, near main chauraha NH8, Behror, Rajasthan`;
+Samay par dawai lena bhule nahi! aapki zaroorat ki dawaiyon ke liye hamare paas aayein.
+📍 Kamal Medicals, near main chauraha NH8, Jodhpur Sweets Home ke samne, Behror, Rajasthan`;
 
 const initialFormState = {
   name: '',
-  phone: '',
+  phone: '+91',
   message: getTemplateMessage(''),
   medicine: '',
   reminder_datetime: '',
-  repeat_type: 'one-time',
+  repeat_type: '15-days',
 };
 
 export default function ReminderForm({ onSubmit, editingReminder, onCancelEdit, loading }) {
@@ -39,7 +39,7 @@ export default function ReminderForm({ onSubmit, editingReminder, onCancelEdit, 
         reminder_datetime: editingReminder.reminder_datetime
           ? new Date(editingReminder.reminder_datetime).toISOString().slice(0, 16)
           : '',
-        repeat_type: editingReminder.repeat_type || 'one-time',
+        repeat_type: editingReminder.repeat_type || '15-days',
       });
       setIsMessageEdited(true);
     } else {
@@ -50,7 +50,7 @@ export default function ReminderForm({ onSubmit, editingReminder, onCancelEdit, 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     if (name === 'message') {
       setIsMessageEdited(true);
       setForm({ ...form, [name]: value });
@@ -131,7 +131,7 @@ export default function ReminderForm({ onSubmit, editingReminder, onCancelEdit, 
               name="phone"
               value={form.phone}
               onChange={handleChange}
-              placeholder="e.g. 919876543210"
+              placeholder="e.g. +919876543210"
               className="input-field"
               required
               id="input-phone"

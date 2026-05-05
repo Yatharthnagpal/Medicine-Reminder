@@ -7,7 +7,27 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 30000, // 30s timeout — Render free tier can be slow on cold start
 });
+
+// Retry logic for Render free-tier cold starts
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const config = error.config;
+    // Retry once on network errors or 5xx (cold start)
+    if (
+      !config._retried &&
+      (!error.response || error.response.status >= 500)
+    ) {
+      config._retried = true;
+      // Wait 3 seconds before retrying (give Render time to wake up)
+      await new Promise((r) => setTimeout(r, 3000));
+      return api(config);
+    }
+    return Promise.reject(error);
+  }
+);
 
 // --- Reminders ---
 
@@ -44,3 +64,4 @@ export const getDashboardStats = async () => {
 };
 
 export default api;
+

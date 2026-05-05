@@ -5,13 +5,15 @@ import ReminderCard from './ReminderCard';
 export default function ReminderList({ reminders, onEdit, onDelete, onStatusChange, loading, title = "All Reminders" }) {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredReminders = reminders.filter((reminder) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      reminder.name.toLowerCase().includes(query) ||
-      reminder.phone.includes(query)
-    );
-  });
+  const filteredReminders = reminders
+    .filter((reminder) => {
+      const query = searchQuery.toLowerCase();
+      return (
+        reminder.name.toLowerCase().includes(query) ||
+        reminder.phone.includes(query)
+      );
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div className="animate-fade-in">

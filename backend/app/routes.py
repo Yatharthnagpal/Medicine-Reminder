@@ -33,7 +33,7 @@ def get_all_reminders(db: Session = Depends(get_db)):
     """Get all reminders ordered by reminder datetime."""
     reminders = (
         db.query(Reminder)
-        .order_by(Reminder.reminder_datetime.asc())
+        .order_by(Reminder.name.asc())
         .all()
     )
     return reminders

@@ -23,19 +23,19 @@ def _next_after_send(reminder: Reminder) -> Tuple[str, Optional[datetime]]:
     After a successful notify, return (new_status, new_reminder_datetime).
     For recurring reminders, new_reminder_datetime is the next scheduled time; else None.
     """
-    rt = reminder.repeat_type or "one-time"
-    if rt == "one-time":
-        return "sent", None
+    rt = reminder.repeat_type or "15-days"
 
     now = _utc_now_naive()
     current = reminder.reminder_datetime
     if current is None:
         return "sent", None
 
-    if rt == "daily":
-        delta = timedelta(days=1)
-    elif rt == "10-days":
+    if rt == "10-days":
         delta = timedelta(days=10)
+    elif rt == "15-days":
+        delta = timedelta(days=15)
+    elif rt == "20-days":
+        delta = timedelta(days=20)
     elif rt == "monthly":
         delta = timedelta(days=30)
     else:

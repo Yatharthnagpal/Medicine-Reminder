@@ -5,9 +5,9 @@ from enum import Enum
 
 
 class RepeatType(str, Enum):
-    ONE_TIME = "one-time"
-    DAILY = "daily"
     TEN_DAYS = "10-days"
+    FIFTEEN_DAYS = "15-days"
+    TWENTY_DAYS = "20-days"
     MONTHLY = "monthly"
 
 
@@ -25,7 +25,7 @@ class ReminderCreate(BaseModel):
     message: str = Field(..., min_length=1, description="Reminder message")
     medicine: Optional[str] = Field(None, description="Medicine name (admin only)")
     reminder_datetime: datetime = Field(..., description="When to send the reminder")
-    repeat_type: RepeatType = Field(default=RepeatType.ONE_TIME, description="Repeat frequency")
+    repeat_type: RepeatType = Field(default=RepeatType.FIFTEEN_DAYS, description="Repeat frequency")
 
 
 class ReminderUpdate(BaseModel):
