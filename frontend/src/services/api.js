@@ -56,6 +56,11 @@ export const deleteReminder = async (id) => {
   return response.data;
 };
 
+export const bulkUpdateMessages = async () => {
+  const response = await api.post('/reminders/update-messages');
+  return response.data;
+};
+
 // --- Dashboard ---
 
 export const getDashboardStats = async () => {

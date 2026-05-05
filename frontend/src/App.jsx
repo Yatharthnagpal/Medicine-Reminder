@@ -11,6 +11,7 @@ import {
   updateReminder,
   deleteReminder,
   getDashboardStats,
+  bulkUpdateMessages,
 } from './services/api';
 
 export default function App() {
@@ -56,7 +57,10 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    fetchData();
+    // Update all existing reminders' messages to the latest template on mount
+    bulkUpdateMessages()
+      .then(() => fetchData())
+      .catch(() => fetchData()); // Still fetch data even if bulk update fails
 
     // Auto-refresh every 30 seconds to reflect scheduler updates
     const interval = setInterval(fetchData, 30000);
@@ -156,16 +160,19 @@ export default function App() {
   };
 
   const todaysReminders = reminders.filter((reminder) => {
+    // Only show pending/failed reminders
+    if (reminder.status !== 'pending' && reminder.status !== 'failed') return false;
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const reminderDate = new Date(reminder.reminder_datetime);
     reminderDate.setHours(0, 0, 0, 0);
     
-    // Include if it's scheduled for today, OR if it's pending and was scheduled in the past
+    // Include if it's pending and scheduled for today, OR if it's overdue
     const isToday = reminderDate.getTime() === today.getTime();
-    const isOverdueAndPending = (reminder.status === 'pending' || reminder.status === 'failed') && reminderDate < today;
+    const isOverdue = reminderDate < today;
     
-    return isToday || isOverdueAndPending;
+    return isToday || isOverdue;
   });
 
   const pendingReminders = reminders.filter(
@@ -211,7 +218,7 @@ export default function App() {
               <div className="lg:col-span-2">
                 <ReminderList
                   reminders={todaysReminders}
-                  title="Today's Reminders"
+                  title="Today's Pending"
                   onEdit={handleEdit}
                   onDelete={handleDelete}
                   onStatusChange={handleStatusChange}

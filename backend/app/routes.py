@@ -94,6 +94,25 @@ def update_reminder(
     return reminder
 
 
+@router.post("/reminders/update-messages", response_model=MessageResponse)
+def bulk_update_messages(db: Session = Depends(get_db)):
+    """Update the message for all reminders using the latest template."""
+    reminders = db.query(Reminder).all()
+    count = 0
+    for reminder in reminders:
+        new_message = (
+            f"🙏 Namaskar {reminder.name} ji!\n\n"
+            "Kamal Medicals, Behror ki taraf se aapko yaad dilana chahte hain:\n\n"
+            "Samay par dawai lena bhule nahi! aapki zaroorat ki dawaiyon ke liye hamare paas aayein.\n"
+            "📍 Kamal Medicals, near main chauraha NH8, Jodhpur Sweets Home ke samne, Behror, Rajasthan"
+        )
+        if reminder.message != new_message:
+            reminder.message = new_message
+            count += 1
+    db.commit()
+    return MessageResponse(message=f"Updated messages for {count} reminders", success=True)
+
+
 @router.delete("/reminders/{reminder_id}", response_model=MessageResponse)
 def delete_reminder(reminder_id: int, db: Session = Depends(get_db)):
     """Delete a reminder by ID."""
