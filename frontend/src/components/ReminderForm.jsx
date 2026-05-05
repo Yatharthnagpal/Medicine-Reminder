@@ -8,12 +8,12 @@ const REPEAT_OPTIONS = [
   { value: 'monthly', label: 'Monthly' },
 ];
 
-const getTemplateMessage = (name) => `Namaskar ${name || '{Name}'} ji!
+const getTemplateMessage = (name) => `🙏 Namaskar ${name || '{Name}'} ji!
 
 Kamal Medicals, Behror ki taraf se aapko yaad dilana chahte hain:
 
 Samay par dawai lena bhule nahi! aapki zaroorat ki dawaiyon ke liye hamare paas aayein.
-Kamal Medicals, near main chauraha NH8, Jodhpur Sweets Home ke samne, Behror, Rajasthan`;
+📍 Kamal Medicals, near main chauraha NH8, Jodhpur Sweets Home ke samne, Behror, Rajasthan`;
 
 const initialFormState = {
   name: '',
