@@ -45,8 +45,11 @@ export default function App() {
         getReminders(),
         getDashboardStats(),
       ]);
-      setReminders(remindersData);
-      setStats(statsData);
+      setReminders(Array.isArray(remindersData) ? remindersData : []);
+      setStats(statsData && typeof statsData === 'object'
+        ? { total: statsData.total || 0, pending: statsData.pending || 0, sent: statsData.sent || 0, failed: statsData.failed || 0 }
+        : { total: 0, pending: 0, sent: 0, failed: 0 }
+      );
     } catch (err) {
       console.error('Error fetching data:', err);
       toast.error('Failed to load data. Is the backend running?');

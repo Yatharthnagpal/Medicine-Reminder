@@ -65,18 +65,14 @@ export default function ReminderForm({ onSubmit, editingReminder, onCancelEdit, 
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     // Convert local datetime to ISO string
     const payload = {
       ...form,
       reminder_datetime: new Date(form.reminder_datetime).toISOString(),
     };
-    try {
-      await onSubmit(payload, editingReminder?.id);
-    } catch (err) {
-      // Error is handled by the parent
-    }
+    onSubmit(payload, editingReminder?.id);
     if (!isEditing) {
       setForm(initialFormState);
       setIsMessageEdited(false);
