@@ -11,7 +11,6 @@ import {
   updateReminder,
   deleteReminder,
   getDashboardStats,
-  bulkUpdateMessages,
 } from './services/api';
 
 export default function App() {
@@ -60,10 +59,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    // Update all existing reminders' messages to the latest template on mount
-    bulkUpdateMessages()
-      .then(() => fetchData())
-      .catch(() => fetchData()); // Still fetch data even if bulk update fails
+    fetchData();
 
     // Auto-refresh every 30 seconds to reflect scheduler updates
     const interval = setInterval(fetchData, 30000);
@@ -148,7 +144,7 @@ export default function App() {
   const handleStatusChange = async (id, newStatus) => {
     try {
       await updateReminder(id, { status: newStatus });
-      toast.success(`Marked as ${newStatus}`);
+      toast.success('Marked as sent! Next reminder scheduled ✅');
       await fetchData();
     } catch (err) {
       console.error('Error updating status:', err);
