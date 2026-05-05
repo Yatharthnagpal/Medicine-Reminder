@@ -133,10 +133,10 @@ def bulk_update_messages(db: Session = Depends(get_db)):
     count = 0
     for reminder in reminders:
         new_message = (
-            f"🙏 Namaskar {reminder.name} ji!\n\n"
+            f"Namaskar {reminder.name} ji!\n\n"
             "Kamal Medicals, Behror ki taraf se aapko yaad dilana chahte hain:\n\n"
             "Samay par dawai lena bhule nahi! aapki zaroorat ki dawaiyon ke liye hamare paas aayein.\n"
-            "📍 Kamal Medicals, near main chauraha NH8, Jodhpur Sweets Home ke samne, Behror, Rajasthan"
+            "Kamal Medicals, near main chauraha NH8, Jodhpur Sweets Home ke samne, Behror, Rajasthan"
         )
         if reminder.message != new_message:
             reminder.message = new_message
