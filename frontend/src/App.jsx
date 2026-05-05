@@ -105,16 +105,22 @@ export default function App() {
         await createReminder(formData);
         toast.success('Reminder created successfully! 🎉');
       }
-      await fetchData();
     } catch (err) {
       console.error('Error saving reminder:', err);
       const errorMsg =
         err.response?.data?.detail?.[0]?.msg ||
         err.response?.data?.detail ||
         'Failed to save reminder';
-      toast.error(errorMsg);
+      toast.error(typeof errorMsg === 'string' ? errorMsg : 'Failed to save reminder');
+      throw err; // Re-throw so ReminderForm knows it failed
     } finally {
       setSubmitting(false);
+    }
+    // Refresh data separately — don't let a failed refresh affect the success flow
+    try {
+      await fetchData();
+    } catch (e) {
+      // Silently ignore refresh errors
     }
   };
 
