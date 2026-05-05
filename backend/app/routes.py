@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
@@ -84,6 +85,37 @@ def update_reminder(
         )
 
     update_data = reminder_data.model_dump(exclude_unset=True)
+
+    # Check if status is being changed to "sent" (manual mark)
+    new_status = update_data.get("status")
+    if new_status and (new_status == "sent" or (hasattr(new_status, "value") and new_status.value == "sent")):
+        # Advance reminder_datetime by repeat interval and reset to pending
+        rt = reminder.repeat_type or "15-days"
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+
+        if rt == "10-days":
+            delta = timedelta(days=10)
+        elif rt == "15-days":
+            delta = timedelta(days=15)
+        elif rt == "20-days":
+            delta = timedelta(days=20)
+        elif rt == "monthly":
+            delta = timedelta(days=30)
+        else:
+            delta = timedelta(days=15)  # fallback
+
+        next_dt = reminder.reminder_datetime + delta if reminder.reminder_datetime else now + delta
+        while next_dt <= now:
+            next_dt += delta
+
+        reminder.reminder_datetime = next_dt
+        reminder.status = "pending"
+        reminder.last_sent_at = now
+        db.commit()
+        db.refresh(reminder)
+        return reminder
+
+    # Normal update (edit form, etc.)
     for field, value in update_data.items():
         if hasattr(value, "value"):
             value = value.value  # Convert enum to string
