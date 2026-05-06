@@ -145,6 +145,36 @@ def bulk_update_messages(db: Session = Depends(get_db)):
     return MessageResponse(message=f"Updated messages for {count} reminders", success=True)
 
 
+@router.post("/reminders/reset-sent", response_model=MessageResponse)
+def reset_sent_reminders(db: Session = Depends(get_db)):
+    """Reset all 'sent' reminders: advance date by repeat interval and set back to pending."""
+    sent_reminders = db.query(Reminder).filter(Reminder.status == "sent").all()
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    count = 0
+    for rem in sent_reminders:
+        rt = rem.repeat_type or "15-days"
+        if rt == "10-days":
+            delta = timedelta(days=10)
+        elif rt == "15-days":
+            delta = timedelta(days=15)
+        elif rt == "20-days":
+            delta = timedelta(days=20)
+        elif rt == "monthly":
+            delta = timedelta(days=30)
+        else:
+            delta = timedelta(days=15)
+
+        next_dt = rem.reminder_datetime + delta if rem.reminder_datetime else now + delta
+        while next_dt <= now:
+            next_dt += delta
+
+        rem.reminder_datetime = next_dt
+        rem.status = "pending"
+        count += 1
+    db.commit()
+    return MessageResponse(message=f"Reset {count} sent reminders to pending", success=True)
+
+
 @router.delete("/reminders/{reminder_id}", response_model=MessageResponse)
 def delete_reminder(reminder_id: int, db: Session = Depends(get_db)):
     """Delete a reminder by ID."""
