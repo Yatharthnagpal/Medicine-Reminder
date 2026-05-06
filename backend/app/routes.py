@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from .database import get_db
 from .models import Reminder
+from .sheets import append_to_sheet
 from .schemas import (
     ReminderCreate,
     ReminderUpdate,
@@ -118,6 +119,13 @@ def create_reminder(reminder_data: ReminderCreate, db: Session = Depends(get_db)
     db.add(new_reminder)
     db.commit()
     db.refresh(new_reminder)
+
+    # Sync to Google Sheets (non-blocking, fails gracefully)
+    try:
+        append_to_sheet(new_reminder.name, new_reminder.phone, new_reminder.medicine or "")
+    except Exception:
+        pass  # Don't fail the API if Sheets sync fails
+
     return new_reminder
 
 
