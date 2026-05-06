@@ -52,6 +52,8 @@ def process_due_reminders() -> None:
     db = SessionLocal()
     try:
         now = _utc_now_naive()
+
+        # 1. Process pending reminders that are due (auto-send via WhatsApp)
         due = (
             db.query(Reminder)
             .filter(Reminder.status == "pending", Reminder.reminder_datetime <= now)
@@ -81,6 +83,18 @@ def process_due_reminders() -> None:
                 rem.reminder_datetime = next_dt
             db.commit()
             logger.info("Reminder %s notified admin -> status=%s", rem.id, new_status)
+
+        # 2. Reset "sent" reminders whose next schedule time has arrived back to "pending"
+        sent_due = (
+            db.query(Reminder)
+            .filter(Reminder.status == "sent", Reminder.reminder_datetime <= now)
+            .all()
+        )
+        for rem in sent_due:
+            rem.status = "pending"
+            db.commit()
+            logger.info("Reminder %s reset from sent -> pending (schedule reached)", rem.id)
+
     except Exception:
         logger.exception("process_due_reminders failed")
         db.rollback()

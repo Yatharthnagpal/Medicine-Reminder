@@ -150,7 +150,7 @@ export default function App() {
   const handleStatusChange = async (id, newStatus) => {
     try {
       await updateReminder(id, { status: newStatus });
-      toast.success('Marked as sent! Next reminder scheduled ✅');
+      toast.success('Marked as sent! Will return to pending on next schedule ✅');
       await fetchData();
     } catch (err) {
       console.error('Error updating status:', err);

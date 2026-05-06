@@ -140,7 +140,8 @@ def update_reminder(
     # Check if status is being changed to "sent" (manual mark)
     new_status = update_data.get("status")
     if new_status and (new_status == "sent" or (hasattr(new_status, "value") and new_status.value == "sent")):
-        # Advance reminder_datetime by repeat interval and reset to pending
+        # Advance reminder_datetime to next schedule, keep as "sent"
+        # The scheduler will reset to "pending" when the next date arrives
         rt = reminder.repeat_type or "15-days"
         now = datetime.now(timezone.utc).replace(tzinfo=None)
 
@@ -160,7 +161,7 @@ def update_reminder(
             next_dt += delta
 
         reminder.reminder_datetime = next_dt
-        reminder.status = "pending"
+        reminder.status = "sent"
         reminder.last_sent_at = now
         db.commit()
         db.refresh(reminder)
