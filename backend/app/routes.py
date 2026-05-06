@@ -27,6 +27,57 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
     return DashboardStats(total=total, pending=pending, sent=sent, failed=failed)
 
 
+# --- Bulk Operations (must be before {reminder_id} routes) ---
+
+@router.post("/reminders/update-messages", response_model=MessageResponse)
+def bulk_update_messages(db: Session = Depends(get_db)):
+    """Update the message for all reminders using the latest template."""
+    reminders = db.query(Reminder).all()
+    count = 0
+    for reminder in reminders:
+        new_message = (
+            f"🙏 Namaskar {reminder.name} ji!\n\n"
+            "Kamal Medicals, Behror ki taraf se aapko yaad dilana chahte hain:\n\n"
+            "Samay par dawai lena bhule nahi! aapki zaroorat ki dawaiyon ke liye hamare paas aayein.\n"
+            "📍 Kamal Medicals, near main chauraha NH8, Jodhpur Sweets Home ke samne, Behror, Rajasthan"
+        )
+        if reminder.message != new_message:
+            reminder.message = new_message
+            count += 1
+    db.commit()
+    return MessageResponse(message=f"Updated messages for {count} reminders", success=True)
+
+
+@router.post("/reminders/reset-sent", response_model=MessageResponse)
+def reset_sent_reminders(db: Session = Depends(get_db)):
+    """Reset all 'sent' reminders: advance date by repeat interval and set back to pending."""
+    sent_reminders = db.query(Reminder).filter(Reminder.status == "sent").all()
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    count = 0
+    for rem in sent_reminders:
+        rt = rem.repeat_type or "15-days"
+        if rt == "10-days":
+            delta = timedelta(days=10)
+        elif rt == "15-days":
+            delta = timedelta(days=15)
+        elif rt == "20-days":
+            delta = timedelta(days=20)
+        elif rt == "monthly":
+            delta = timedelta(days=30)
+        else:
+            delta = timedelta(days=15)
+
+        next_dt = rem.reminder_datetime + delta if rem.reminder_datetime else now + delta
+        while next_dt <= now:
+            next_dt += delta
+
+        rem.reminder_datetime = next_dt
+        rem.status = "pending"
+        count += 1
+    db.commit()
+    return MessageResponse(message=f"Reset {count} sent reminders to pending", success=True)
+
+
 # --- CRUD Operations ---
 
 @router.get("/reminders", response_model=List[ReminderResponse])
@@ -124,55 +175,6 @@ def update_reminder(
     db.commit()
     db.refresh(reminder)
     return reminder
-
-
-@router.post("/reminders/update-messages", response_model=MessageResponse)
-def bulk_update_messages(db: Session = Depends(get_db)):
-    """Update the message for all reminders using the latest template."""
-    reminders = db.query(Reminder).all()
-    count = 0
-    for reminder in reminders:
-        new_message = (
-            f"🙏 Namaskar {reminder.name} ji!\n\n"
-            "Kamal Medicals, Behror ki taraf se aapko yaad dilana chahte hain:\n\n"
-            "Samay par dawai lena bhule nahi! aapki zaroorat ki dawaiyon ke liye hamare paas aayein.\n"
-            "📍 Kamal Medicals, near main chauraha NH8, Jodhpur Sweets Home ke samne, Behror, Rajasthan"
-        )
-        if reminder.message != new_message:
-            reminder.message = new_message
-            count += 1
-    db.commit()
-    return MessageResponse(message=f"Updated messages for {count} reminders", success=True)
-
-
-@router.post("/reminders/reset-sent", response_model=MessageResponse)
-def reset_sent_reminders(db: Session = Depends(get_db)):
-    """Reset all 'sent' reminders: advance date by repeat interval and set back to pending."""
-    sent_reminders = db.query(Reminder).filter(Reminder.status == "sent").all()
-    now = datetime.now(timezone.utc).replace(tzinfo=None)
-    count = 0
-    for rem in sent_reminders:
-        rt = rem.repeat_type or "15-days"
-        if rt == "10-days":
-            delta = timedelta(days=10)
-        elif rt == "15-days":
-            delta = timedelta(days=15)
-        elif rt == "20-days":
-            delta = timedelta(days=20)
-        elif rt == "monthly":
-            delta = timedelta(days=30)
-        else:
-            delta = timedelta(days=15)
-
-        next_dt = rem.reminder_datetime + delta if rem.reminder_datetime else now + delta
-        while next_dt <= now:
-            next_dt += delta
-
-        rem.reminder_datetime = next_dt
-        rem.status = "pending"
-        count += 1
-    db.commit()
-    return MessageResponse(message=f"Reset {count} sent reminders to pending", success=True)
 
 
 @router.delete("/reminders/{reminder_id}", response_model=MessageResponse)
