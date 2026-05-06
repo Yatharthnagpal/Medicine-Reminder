@@ -1,4 +1,4 @@
-import { Calendar, Clock, MessageSquare, RotateCcw, Pencil, Trash2, User, Phone, ExternalLink, CheckCircle2, XCircle } from 'lucide-react';
+import { Calendar, Clock, MessageSquare, RotateCcw, Pencil, Trash2, User, Phone, ExternalLink, CheckCircle2 } from 'lucide-react';
 import StatusBadge from './StatusBadge';
 
 export default function ReminderCard({ reminder, onEdit, onDelete, onStatusChange }) {

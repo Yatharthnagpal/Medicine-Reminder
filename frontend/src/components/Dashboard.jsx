@@ -1,4 +1,4 @@
-import { ClipboardList, Clock, CheckCircle2, XCircle, TrendingUp } from 'lucide-react';
+import { ClipboardList, Clock, CheckCircle2, TrendingUp } from 'lucide-react';
 
 export default function Dashboard({ stats, loading, onCardClick }) {
   const cards = [

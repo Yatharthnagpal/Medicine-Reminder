@@ -44,11 +44,6 @@ export const getReminders = async () => {
   }
 };
 
-export const getReminder = async (id) => {
-  const response = await api.get(`/reminders/${id}`);
-  return response.data;
-};
-
 export const createReminder = async (data) => {
   const response = await api.post('/reminders', data);
   return response.data;
@@ -61,11 +56,6 @@ export const updateReminder = async (id, data) => {
 
 export const deleteReminder = async (id) => {
   const response = await api.delete(`/reminders/${id}`);
-  return response.data;
-};
-
-export const bulkUpdateMessages = async () => {
-  const response = await api.post('/reminders/update-messages');
   return response.data;
 };
 
