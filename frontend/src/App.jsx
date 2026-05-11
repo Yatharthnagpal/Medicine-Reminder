@@ -28,6 +28,7 @@ export default function App() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const notifiedReminderIdsRef = useRef(new Set());
+  const previousViewRef = useRef('dashboard');
 
   const sendBrowserNotification = useCallback((title, body) => {
     if (typeof window === 'undefined' || !('Notification' in window)) return;
@@ -137,14 +138,17 @@ export default function App() {
     }
   };
 
-  // Edit reminder
+  // Edit reminder — switch to edit page
   const handleEdit = (reminder) => {
+    previousViewRef.current = currentView;
     setEditingReminder(reminder);
+    setCurrentView('edit');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCancelEdit = () => {
     setEditingReminder(null);
+    setCurrentView(previousViewRef.current || 'dashboard');
   };
 
   const handleStatusChange = async (id, newStatus) => {
@@ -202,7 +206,19 @@ export default function App() {
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {currentView === 'dashboard' ? (
+        {currentView === 'edit' && editingReminder ? (
+          <div className="max-w-xl mx-auto">
+            <ReminderForm
+              onSubmit={async (formData, editId) => {
+                await handleSubmit(formData, editId);
+                setCurrentView(previousViewRef.current || 'dashboard');
+              }}
+              editingReminder={editingReminder}
+              onCancelEdit={handleCancelEdit}
+              loading={submitting}
+            />
+          </div>
+        ) : currentView === 'dashboard' ? (
           <>
             {/* Dashboard Stats */}
             <Dashboard stats={stats} loading={loadingStats} onCardClick={setCurrentView} />
@@ -213,7 +229,7 @@ export default function App() {
               <div className="lg:col-span-1">
                 <ReminderForm
                   onSubmit={handleSubmit}
-                  editingReminder={editingReminder}
+                  editingReminder={null}
                   onCancelEdit={handleCancelEdit}
                   loading={submitting}
                 />
