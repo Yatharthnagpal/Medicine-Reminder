@@ -10,7 +10,7 @@ class Reminder(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String(100), nullable=False)
-    phone = Column(String(20), nullable=False)
+    phone = Column(String(20), nullable=False, unique=True, index=True)
     message = Column(Text, nullable=False)
     medicine = Column(Text, nullable=True)
     reminder_datetime = Column(DateTime, nullable=False)

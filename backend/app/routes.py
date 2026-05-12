@@ -106,6 +106,14 @@ def get_reminder(reminder_id: int, db: Session = Depends(get_db)):
 @router.post("/reminders", response_model=ReminderResponse, status_code=status.HTTP_201_CREATED)
 def create_reminder(reminder_data: ReminderCreate, db: Session = Depends(get_db)):
     """Create a new reminder."""
+    # Check for duplicate phone number
+    existing = db.query(Reminder).filter(Reminder.phone == reminder_data.phone).first()
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"A reminder with phone number {reminder_data.phone} already exists (Name: {existing.name})"
+        )
+
     new_reminder = Reminder(
         name=reminder_data.name,
         phone=reminder_data.phone,
@@ -136,6 +144,16 @@ def update_reminder(
         )
 
     update_data = reminder_data.model_dump(exclude_unset=True)
+
+    # Check for duplicate phone number on update
+    new_phone = update_data.get("phone")
+    if new_phone and new_phone != reminder.phone:
+        existing = db.query(Reminder).filter(Reminder.phone == new_phone).first()
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"A reminder with phone number {new_phone} already exists (Name: {existing.name})"
+            )
 
     # Check if status is being changed to "sent" (manual mark)
     new_status = update_data.get("status")

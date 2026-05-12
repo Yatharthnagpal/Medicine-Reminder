@@ -27,6 +27,7 @@ const initialFormState = {
 export default function ReminderForm({ onSubmit, editingReminder, onCancelEdit, loading }) {
   const [form, setForm] = useState(initialFormState);
   const [isMessageEdited, setIsMessageEdited] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
   const isEditing = !!editingReminder;
 
   useEffect(() => {
@@ -50,6 +51,11 @@ export default function ReminderForm({ onSubmit, editingReminder, onCancelEdit, 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Clear phone error when user edits the phone field
+    if (name === 'phone') {
+      setPhoneError('');
+    }
 
     if (name === 'message') {
       setIsMessageEdited(true);
@@ -76,13 +82,19 @@ export default function ReminderForm({ onSubmit, editingReminder, onCancelEdit, 
       reminder_datetime: new Date(form.reminder_datetime).toISOString(),
     };
     try {
+      setPhoneError('');
       await onSubmit(payload, editingReminder?.id);
       if (!isEditing) {
         setForm(initialFormState);
         setIsMessageEdited(false);
       }
     } catch (err) {
-      // Error is handled by parent
+      // Show inline error for duplicate phone
+      const status = err.response?.status;
+      const detail = err.response?.data?.detail || '';
+      if (status === 409 && typeof detail === 'string') {
+        setPhoneError(detail);
+      }
     }
   };
 
@@ -139,10 +151,15 @@ export default function ReminderForm({ onSubmit, editingReminder, onCancelEdit, 
               value={form.phone}
               onChange={handleChange}
               placeholder="e.g. +919876543210"
-              className="input-field"
+              className={`input-field ${phoneError ? 'border-red-500 ring-1 ring-red-500' : ''}`}
               required
               id="input-phone"
             />
+            {phoneError && (
+              <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                ⚠️ {phoneError}
+              </p>
+            )}
           </div>
         </div>
 

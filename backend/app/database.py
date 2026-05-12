@@ -35,6 +35,13 @@ def ensure_sqlite_reminders_schema() -> None:
             conn.execute(text("ALTER TABLE reminders ADD COLUMN medicine TEXT"))
             conn.commit()
 
+        # Ensure unique index on phone column (for existing DBs)
+        indexes = conn.execute(text("PRAGMA index_list(reminders)")).fetchall()
+        idx_names = {r[1] for r in indexes}
+        if "ix_reminders_phone_unique" not in idx_names:
+            conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ix_reminders_phone_unique ON reminders(phone)"))
+            conn.commit()
+
 
 def get_db():
     """Dependency that provides a database session."""
