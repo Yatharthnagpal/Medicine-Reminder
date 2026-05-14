@@ -185,27 +185,39 @@ export default function App() {
     toast.success('Logged out successfully 👋');
   };
 
-  const todaysReminders = reminders.filter((reminder) => {
-    // Only show pending/failed reminders
-    if (reminder.status !== 'pending' && reminder.status !== 'failed') return false;
+  // Helper: sort reminders by date (earliest first)
+  const sortByDate = (list) =>
+    [...list].sort(
+      (a, b) => new Date(a.reminder_datetime) - new Date(b.reminder_datetime)
+    );
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const reminderDate = new Date(reminder.reminder_datetime);
-    reminderDate.setHours(0, 0, 0, 0);
-    
-    // Include if it's pending and scheduled for today, OR if it's overdue
-    const isToday = reminderDate.getTime() === today.getTime();
-    const isOverdue = reminderDate < today;
-    
-    return isToday || isOverdue;
-  });
+  const todaysReminders = sortByDate(
+    reminders.filter((reminder) => {
+      // Only show pending/failed reminders
+      if (reminder.status !== 'pending' && reminder.status !== 'failed') return false;
 
-  const pendingReminders = reminders.filter(
-    (reminder) => reminder.status === 'pending' || reminder.status === 'failed'
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const reminderDate = new Date(reminder.reminder_datetime);
+      reminderDate.setHours(0, 0, 0, 0);
+
+      // Include if it's pending and scheduled for today, OR if it's overdue
+      const isToday = reminderDate.getTime() === today.getTime();
+      const isOverdue = reminderDate < today;
+
+      return isToday || isOverdue;
+    })
   );
 
-  const sentReminders = reminders.filter((reminder) => reminder.status === 'sent');
+  const pendingReminders = sortByDate(
+    reminders.filter(
+      (reminder) => reminder.status === 'pending' || reminder.status === 'failed'
+    )
+  );
+
+  const sentReminders = sortByDate(
+    reminders.filter((reminder) => reminder.status === 'sent')
+  );
 
   if (!isAuthenticated) {
     return <Login onLogin={() => {
@@ -272,7 +284,7 @@ export default function App() {
             
             {currentView === 'all' && (
               <ReminderList
-                reminders={reminders}
+                reminders={sortByDate(reminders)}
                 title="All Reminders"
                 onEdit={handleEdit}
                 onDelete={handleDelete}

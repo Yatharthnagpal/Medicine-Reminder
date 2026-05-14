@@ -160,7 +160,7 @@ def update_reminder(
     if new_status and (new_status == "sent" or (hasattr(new_status, "value") and new_status.value == "sent")):
         # Advance reminder_datetime to next schedule, keep as "sent"
         # The scheduler will reset to "pending" when the next date arrives
-        rt = reminder.repeat_type or "15-days"
+        rt = reminder.repeat_type or "monthly"
         now = datetime.now(timezone.utc).replace(tzinfo=None)
 
         if rt == "10-days":
@@ -172,7 +172,7 @@ def update_reminder(
         elif rt == "monthly":
             delta = timedelta(days=30)
         else:
-            delta = timedelta(days=15)  # fallback
+            delta = timedelta(days=30)  # fallback
 
         next_dt = reminder.reminder_datetime + delta if reminder.reminder_datetime else now + delta
         while next_dt <= now:
