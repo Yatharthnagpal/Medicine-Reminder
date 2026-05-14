@@ -13,7 +13,7 @@ export default function ReminderList({ reminders, onEdit, onDelete, onStatusChan
         reminder.phone.includes(query)
       );
     })
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort((a, b) => new Date(a.reminder_datetime) - new Date(b.reminder_datetime));
 
   return (
     <div className="animate-fade-in">
