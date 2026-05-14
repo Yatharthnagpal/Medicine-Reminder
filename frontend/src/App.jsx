@@ -32,9 +32,18 @@ export default function App() {
 
   const sendBrowserNotification = useCallback((title, body) => {
     if (typeof window === 'undefined' || !('Notification' in window)) return;
+    if (Notification.permission !== 'granted') return;
 
-    if (Notification.permission === 'granted') {
+    try {
+      // Android Chrome forbids `new Notification()` — throws "Illegal constructor"
       new Notification(title, { body });
+    } catch {
+      // Fallback: use ServiceWorker notification if available (required on Android)
+      if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
+        navigator.serviceWorker.ready
+          .then((reg) => reg.showNotification(title, { body }))
+          .catch(() => {}); // silently ignore if SW not registered
+      }
     }
   }, []);
 
