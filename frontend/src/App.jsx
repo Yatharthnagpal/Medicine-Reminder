@@ -70,9 +70,17 @@ export default function App() {
   useEffect(() => {
     if (typeof window === 'undefined' || !('Notification' in window)) return;
     if (Notification.permission === 'default') {
-      Notification.requestPermission().catch(() => {
-        // Ignore permission request failures.
-      });
+      try {
+        // Some older Android browsers use callback-based API (returns undefined, not a Promise)
+        const result = Notification.requestPermission(() => {});
+        if (result && typeof result.catch === 'function') {
+          result.catch(() => {
+            // Ignore permission request failures.
+          });
+        }
+      } catch {
+        // Ignore — Notification API not fully supported on this device
+      }
     }
   }, []);
 

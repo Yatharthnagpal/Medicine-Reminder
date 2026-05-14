@@ -28,9 +28,15 @@ export default class ErrorBoundary extends Component {
               <span className="text-3xl">⚠️</span>
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Something went wrong</h2>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-gray-500 mb-4">
               The app encountered an error. This is usually temporary.
             </p>
+            {this.state.error && (
+              <pre className="text-xs text-left text-red-600 bg-red-50 rounded-lg p-3 mb-4 overflow-auto max-h-40 whitespace-pre-wrap break-words">
+                {this.state.error.toString()}
+                {this.state.error.stack && '\n\n' + this.state.error.stack}
+              </pre>
+            )}
             <button
               onClick={this.handleReset}
               className="px-6 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white font-medium rounded-xl hover:opacity-90 transition-opacity shadow-md"
