@@ -1,6 +1,6 @@
 .env
 backend/venv/
-backend/reminders.db
+# backend/reminders.db  # temporarily tracked for Render deploy
 node_modules/
 __pycache__/
 *.pyc
