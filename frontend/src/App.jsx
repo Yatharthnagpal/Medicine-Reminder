@@ -30,22 +30,7 @@ export default function App() {
   const notifiedReminderIdsRef = useRef(new Set());
   const previousViewRef = useRef('dashboard');
 
-  const sendBrowserNotification = useCallback((title, body) => {
-    if (typeof window === 'undefined' || !('Notification' in window)) return;
-    if (Notification.permission !== 'granted') return;
 
-    try {
-      // Android Chrome forbids `new Notification()` — throws "Illegal constructor"
-      new Notification(title, { body });
-    } catch {
-      // Fallback: use ServiceWorker notification if available (required on Android)
-      if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
-        navigator.serviceWorker.ready
-          .then((reg) => reg.showNotification(title, { body }))
-          .catch(() => {}); // silently ignore if SW not registered
-      }
-    }
-  }, []);
 
   // Fetch all data
   const fetchData = useCallback(async () => {
@@ -76,22 +61,7 @@ export default function App() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  useEffect(() => {
-    if (typeof window === 'undefined' || !('Notification' in window)) return;
-    if (Notification.permission === 'default') {
-      try {
-        // Some older Android browsers use callback-based API (returns undefined, not a Promise)
-        const result = Notification.requestPermission(() => {});
-        if (result && typeof result.catch === 'function') {
-          result.catch(() => {
-            // Ignore permission request failures.
-          });
-        }
-      } catch {
-        // Ignore — Notification API not fully supported on this device
-      }
-    }
-  }, []);
+
 
   useEffect(() => {
     const now = new Date();
@@ -107,9 +77,8 @@ export default function App() {
       toast(`Reminder due: ${reminder.name} - ${reminder.medicine || 'Time for medicine'}`, {
         icon: '🔔',
       });
-      sendBrowserNotification(`Reminder: ${reminder.name}`, reminder.medicine || 'Time for medicine');
     });
-  }, [reminders, sendBrowserNotification]);
+  }, [reminders]);
 
   // Create or update reminder
   const handleSubmit = async (formData, editId) => {
