@@ -11,7 +11,8 @@ import {
   updateReminder,
   deleteReminder,
   getDashboardStats,
-} from './services/api';
+  processDueReminders,
+} from './services/db';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -56,8 +57,11 @@ export default function App() {
   useEffect(() => {
     fetchData();
 
-    // Auto-refresh every 30 seconds to reflect scheduler updates
-    const interval = setInterval(fetchData, 30000);
+    // Auto-refresh every 30 seconds + process due reminders locally
+    const interval = setInterval(async () => {
+      await processDueReminders();
+      await fetchData();
+    }, 30000);
     return () => clearInterval(interval);
   }, [fetchData]);
 
