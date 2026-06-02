@@ -2,6 +2,7 @@
 backend/venv/
 backend/reminders.db
 backend/reminders.json
+frontend/src/data/seed.json
 node_modules/
 __pycache__/
 *.pyc
