@@ -85,8 +85,8 @@ copy .env.example .env
 python run.py
 ```
 
-The backend will start at **http://localhost:8000**
-- API docs: http://localhost:8000/docs
+The backend will start at **https://medicine-reminder-3qp2.onrender.com**
+- API docs: **https://medicine-reminder-3qp2.onrender.com/docs**
 
 ### 2. Frontend Setup
 
@@ -100,7 +100,7 @@ npm install
 npm run dev
 ```
 
-The frontend will start at **http://localhost:5173**
+The frontend will start at **https://medicine-reminder-two.vercel.app**
 
 ---
 
